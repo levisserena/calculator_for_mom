@@ -121,9 +121,7 @@ class LogicDBWindow(LogicDBWindowProtocol):
         result_price = Decimal(price) / Decimal(quantity)
         return self.dimension.get_base(dimension, result_price)
 
-    def calculation(
-        self, price: float, quantity: int, dimension: str
-    ) -> str:
+    def calculation(self, price: float, quantity: int, dimension: str) -> str:
         """
         Вернет стоимость, исходя из цены за единицу измерения (например, м),
         количеств в единцах измерения (например, см).

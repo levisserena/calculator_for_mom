@@ -1,55 +1,30 @@
-from abc import ABC, abstractmethod
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
-    QApplication,
-    QCheckBox,
-    QComboBox,
-    QDateEdit,
-    QDateTimeEdit,
-    QDial,
-    QDoubleSpinBox,
-    QFontComboBox,
-    QLabel,
-    QLCDNumber,
-    QLineEdit,
-    QMainWindow,
-    QProgressBar,
-    QPushButton,
-    QRadioButton,
-    QSlider,
-    QSpinBox,
-    QTimeEdit,
-    QVBoxLayout,
-    QHBoxLayout,
-    QWidget,
-    QGridLayout,
     QFormLayout,
-    QTableWidget,
-    QTableView,
+    QHBoxLayout,
     QHeaderView,
-    QMessageBox,
-    QDialog,
-    QDialogButtonBox,
-    QTextEdit,
+    QLabel,
+    QMainWindow,
+    QPushButton,
+    QTableView,
+    QVBoxLayout,
+    QWidget,
 )
 
+from app.logic.adapter import LogicMainWindow, logic_db_window
 from app.models import (
     RowViewOnDBTable,
     RowViewOnMainTable,
     ViewOnDBTableModels,
     ViewOnMainTableModels,
 )
-from app.logic.adapter import LogicMainWindow, logic_db_window
-from app.logic.dimension import DimensionConverter
-from app.db.repository import repository
 
-from .db import DBWindow
 from .add_or_update import AddRowWindow, UpdateRowWindow
+from .db import DBWindow
 
 
 class MainWindow(QMainWindow):
-
     def __init__(self):
         super(MainWindow, self).__init__()
         self.logic_for_main = LogicMainWindow()

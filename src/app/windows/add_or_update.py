@@ -1,39 +1,25 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
-from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
-    QApplication,
-    QCheckBox,
     QComboBox,
-    QDateEdit,
-    QDateTimeEdit,
-    QDial,
-    QDoubleSpinBox,
-    QFontComboBox,
-    QLabel,
-    QLCDNumber,
-    QLineEdit,
-    QMainWindow,
-    QProgressBar,
-    QPushButton,
-    QRadioButton,
-    QSlider,
-    QSpinBox,
-    QTimeEdit,
-    QVBoxLayout,
-    QHBoxLayout,
-    QWidget,
-    QGridLayout,
-    QFormLayout,
-    QTableWidget,
-    QTableView,
-    QHeaderView,
-    QMessageBox,
     QDialog,
     QDialogButtonBox,
-    QTextEdit,
+    QFormLayout,
+    QHBoxLayout,
+    QHeaderView,
+    QLabel,
+    QMessageBox,
+    QPushButton,
+    QSpinBox,
+    QTableView,
+    QWidget,
 )
-from app.protocol import LogicDBWindowProtocol, LogicMainWindowProtocol, RowViewProtocol
+
+from app.protocol import (
+    LogicDBWindowProtocol,
+    LogicMainWindowProtocol,
+    RowViewProtocol,
+)
 
 
 class BaseRowWindow(QDialog):
@@ -74,8 +60,8 @@ class BaseRowWindow(QDialog):
         layout_top.addWidget(self.button_choice, stretch=1)
 
         buttons = QDialogButtonBox(
-            QDialogButtonBox.StandardButton.Ok |
-            QDialogButtonBox.StandardButton.Cancel
+            QDialogButtonBox.StandardButton.Ok
+            | QDialogButtonBox.StandardButton.Cancel
         )
         buttons.accepted.connect(self.perform_action)
         buttons.rejected.connect(self.reject)
@@ -101,14 +87,15 @@ class BaseRowWindow(QDialog):
     def validate_form(self):
         if self.quantity_input.value() == 0:
             QMessageBox.warning(
-                self, 'Ошибка', 'Количество должно быть больше 0!',
+                self,
+                'Ошибка',
+                'Количество должно быть больше 0!',
             )
             return False
         return True
 
 
 class AddRowWindow(BaseRowWindow):
-
     def __init__(
         self,
         parent,
@@ -158,14 +145,13 @@ class AddRowWindow(BaseRowWindow):
 
 
 class UpdateRowWindow(BaseRowWindow):
-
     def __init__(
         self,
         parent: QWidget,
         logic_for_main: LogicMainWindowProtocol,
         logic_for_db: LogicDBWindowProtocol,
         row_for_main: RowViewProtocol,
-        index_row: RowViewProtocol
+        index_row: RowViewProtocol,
     ):
         self.index_row = index_row
         super().__init__(parent, logic_for_main, logic_for_db, row_for_main)
@@ -219,7 +205,6 @@ class UpdateRowWindow(BaseRowWindow):
 
 
 class WindowChoiceItem(QDialog):
-
     def __init__(
         self,
         parent: QWidget,

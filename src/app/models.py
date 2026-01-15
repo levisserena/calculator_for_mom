@@ -1,12 +1,11 @@
 from decimal import Decimal
 
-from PyQt6.QtCore import Qt, QAbstractTableModel
+from PyQt6.QtCore import QAbstractTableModel, Qt
 
 from app.protocol import RowViewProtocol
 
 
 class RowViewOnMainTable(RowViewProtocol):
-
     headers = ['Название', 'Количество', 'Размерность', 'Стоимость']
 
     def __init__(
@@ -48,7 +47,6 @@ class RowViewOnMainTable(RowViewProtocol):
 
 
 class RowViewOnDBTable(RowViewProtocol):
-
     headers = ['ID', 'Название', 'Описание', 'Размерность', 'Стоимость']
 
     def __init__(
@@ -67,7 +65,11 @@ class RowViewOnDBTable(RowViewProtocol):
 
     def __getitem__(self, index):
         return [
-            self.id, self.name, self.description, self.dimension, self.price
+            self.id,
+            self.name,
+            self.description,
+            self.dimension,
+            self.price,
         ][index]
 
     def __len__(self):
@@ -84,7 +86,6 @@ class RowViewOnDBTable(RowViewProtocol):
 
 
 class ViewOnMainTableModels(QAbstractTableModel):
-
     def __init__(self, data=None):
         super().__init__()
         self.row = RowViewOnMainTable
@@ -113,7 +114,6 @@ class ViewOnMainTableModels(QAbstractTableModel):
 
 
 class ViewOnDBTableModels(QAbstractTableModel):
-
     def __init__(self, data=None):
         super().__init__()
         self.row = RowViewOnDBTable

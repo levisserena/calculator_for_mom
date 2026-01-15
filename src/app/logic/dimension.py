@@ -1,11 +1,10 @@
-from enum import Enum
 from decimal import Decimal
+from enum import Enum
 
 from app.protocol import CategoryType
 
 
 class Category(Enum):
-
     LENGTH = 'длина'
     VOLUME = 'объем'
     MASSA = 'масса'
@@ -13,7 +12,6 @@ class Category(Enum):
 
 
 class DimensionType:
-
     def __init__(
         self, dimension: str, category: CategoryType, weight: int, base: bool
     ):
@@ -24,7 +22,6 @@ class DimensionType:
 
 
 class DimensionConverter(Enum):
-
     PIECE = DimensionType('шт', Category.PIECE, 1, True)
     METRE = DimensionType('м', Category.LENGTH, 1, True)
     DECIMETER = DimensionType('дм', Category.LENGTH, 10, False)
@@ -43,7 +40,8 @@ class DimensionConverter(Enum):
         category = cursor.value.category
         base = [
             dim
-            for dim in cls if dim.value.category == category and dim.value.base
+            for dim in cls
+            if dim.value.category == category and dim.value.base
         ][0]
         ratio = str(
             value / Decimal(cursor.value.weight) * Decimal(base.value.weight)
@@ -55,7 +53,8 @@ class DimensionConverter(Enum):
         """Вернет все размерности для данной категории."""
         return [
             dim.value.dimension
-            for dim in cls if dim.value.category == category
+            for dim in cls
+            if dim.value.category == category
         ]
 
     @classmethod
@@ -63,7 +62,8 @@ class DimensionConverter(Enum):
         """Вернет категорию для данной размерности."""
         categories = [
             dim.value.category
-            for dim in cls if dim.value.dimension == dimension
+            for dim in cls
+            if dim.value.dimension == dimension
         ]
         return categories[0] if categories else None
 

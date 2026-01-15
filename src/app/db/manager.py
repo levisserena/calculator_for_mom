@@ -1,4 +1,4 @@
-from sqlite3 import connect, Cursor
+from sqlite3 import Cursor, connect
 
 
 class Connector:

@@ -1,43 +1,24 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
-    QApplication,
-    QCheckBox,
     QComboBox,
-    QDateEdit,
-    QDateTimeEdit,
-    QDial,
-    QDoubleSpinBox,
-    QFontComboBox,
-    QLabel,
-    QLCDNumber,
-    QLineEdit,
-    QMainWindow,
-    QProgressBar,
-    QPushButton,
-    QRadioButton,
-    QSlider,
-    QSpinBox,
-    QTimeEdit,
-    QVBoxLayout,
-    QHBoxLayout,
-    QWidget,
-    QGridLayout,
-    QFormLayout,
-    QTableWidget,
-    QTableView,
-    QHeaderView,
-    QMessageBox,
     QDialog,
     QDialogButtonBox,
+    QDoubleSpinBox,
+    QFormLayout,
+    QHBoxLayout,
+    QHeaderView,
+    QLineEdit,
+    QMessageBox,
+    QPushButton,
+    QSpinBox,
+    QTableView,
     QTextEdit,
+    QWidget,
 )
 
-from app.models import ViewOnMainTableModels, RowViewOnMainTable, ViewOnDBTableModels, RowViewOnDBTable
-from app.logic.adapter import LogicMainWindow, logic_db_window
 from app.logic.dimension import DimensionConverter
-from app.db.repository import repository
 from app.protocol import LogicDBWindowProtocol, RowViewProtocol
 
 
@@ -147,10 +128,9 @@ class DBWindow(QDialog):
 
 
 class BaseDBDialogWindow(QDialog):
-
     def __init__(
         self,
-        parent:  QWidget,
+        parent: QWidget,
         logic_for_db: LogicDBWindowProtocol,
     ):
         super().__init__(parent)
@@ -178,8 +158,8 @@ class BaseDBDialogWindow(QDialog):
         self.dimension_input.addItems(DimensionConverter.get_all())
 
         buttons = QDialogButtonBox(
-            QDialogButtonBox.StandardButton.Ok |
-            QDialogButtonBox.StandardButton.Cancel
+            QDialogButtonBox.StandardButton.Ok
+            | QDialogButtonBox.StandardButton.Cancel
         )
         buttons.accepted.connect(self.perform_action)
         buttons.rejected.connect(self.reject)
@@ -204,17 +184,23 @@ class BaseDBDialogWindow(QDialog):
         """Валидирование заполнение формы окна."""
         if self.name_input.text() == '':
             QMessageBox.warning(
-                self, 'Ошибка', 'Введите название!',
+                self,
+                'Ошибка',
+                'Введите название!',
             )
             return False
         if self.quantity_input.value() == 0:
             QMessageBox.warning(
-                self, 'Ошибка', 'Количество должно быть больше 0!',
+                self,
+                'Ошибка',
+                'Количество должно быть больше 0!',
             )
             return False
         if self.price_input.value() == 0:
             QMessageBox.warning(
-                self, 'Ошибка', 'Цена должна быть больше 0!',
+                self,
+                'Ошибка',
+                'Цена должна быть больше 0!',
             )
             return False
         return True
@@ -248,7 +234,6 @@ class DBAddWindow(BaseDBDialogWindow):
 
 
 class DBUpdateWindow(BaseDBDialogWindow):
-
     def __init__(
         self,
         parent: QWidget,

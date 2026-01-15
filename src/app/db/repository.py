@@ -10,7 +10,6 @@ DIMENSION = 'dimension'
 
 
 class RepositoryBase:
-
     def __init__(self, connector: Connector):
         self.connector = connector
         self.name_table = NAME_TABLE
@@ -21,7 +20,6 @@ class RepositoryBase:
 
 
 class RepositoryStart(RepositoryBase):
-
     def create_table(self):
         """Создаст таблицу в БД для хранения настроек приложения."""
         with self.connector as cursor:

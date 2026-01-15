@@ -2,7 +2,6 @@ from decimal import Decimal
 from enum import Enum
 from typing import Protocol
 
-
 type CategoryType = Enum
 
 
@@ -36,7 +35,6 @@ class RepositoryProtocol(Protocol):
 
 
 class DimensionConverterProtocol(Protocol):
-
     @classmethod
     def get_base(cls, dimension: str, value: Decimal) -> tuple[str, str]:
         """Вернет базовую размерность и множитель."""
@@ -59,11 +57,9 @@ class RowViewProtocol(Protocol):
 
     headers: list[str]
 
-    def __getitem__(self, index: int):
-        ...
+    def __getitem__(self, index: int): ...
 
-    def __len__(self):
-        ...
+    def __len__(self): ...
 
 
 class LogicMainWindowProtocol(Protocol):
@@ -121,9 +117,7 @@ class LogicDBWindowProtocol(Protocol):
     ) -> None:
         """Изменит запись из базы данных."""
 
-    def calculation(
-        self, price: float, quantity: int, dimension: str
-    ) -> str:
+    def calculation(self, price: float, quantity: int, dimension: str) -> str:
         """
         Вернет стоимость, исходя из цены за единицу измерения (например, м),
         количеств в единцах измерения (например, см).

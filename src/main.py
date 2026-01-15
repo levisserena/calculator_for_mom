@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QApplication
 
-from app.windows.main import MainWindow
 from app.db.repository import start
+from app.windows.main import MainWindow
 
 app = QApplication([])
 window = MainWindow()
