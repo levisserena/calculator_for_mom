@@ -1,32 +1,30 @@
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from app.db.repository import repository
 from app.logic.dimension import DimensionConverter
 from app.models import RowViewOnDBTable
-from app.protocol import (
-    DimensionConverterProtocol,
-    LogicDBWindowProtocol,
-    LogicMainWindowProtocol,
-    RepositoryProtocol,
-    RowViewProtocol,
-)
+
+if TYPE_CHECKING:
+    from app.db.repository import RepositoryDB
+    from app.models import RowViewOnMainTable
 
 
-class LogicMainWindow(LogicMainWindowProtocol):
+class LogicMainWindow:
     """Логика работы главного окна."""
 
     def __init__(self):
         self.data = []
 
-    def get_all(self) -> list[RowViewProtocol]:
+    def get_all(self) -> list['RowViewOnMainTable']:
         """Вернет список объектов-строк обрабатываемых в логике."""
         return self.data
 
-    def get(self, index: int) -> RowViewProtocol:
+    def get(self, index: int) -> 'RowViewOnMainTable':
         """Вернет строку по индексу."""
         return self.data[index]
 
-    def add(self, item: RowViewProtocol) -> None:
+    def add(self, item: 'RowViewOnMainTable') -> None:
         """Добавит для обработки в логике объект-строку."""
         self.data.append(item)
 
@@ -34,7 +32,7 @@ class LogicMainWindow(LogicMainWindowProtocol):
         """Удалит из обработки в логике объект-строку."""
         del self.data[index]
 
-    def update(self, index: int, new: RowViewProtocol) -> None:
+    def update(self, index: int, new: 'RowViewOnMainTable') -> None:
         """Заменит объект-строку в логике."""
         self.data[index] = new
 
@@ -50,21 +48,23 @@ class LogicMainWindow(LogicMainWindowProtocol):
         return f'Итого: {rubles} руб. {kopecks} коп.'
 
 
-class LogicDBWindow(LogicDBWindowProtocol):
+class LogicDBWindow:
     """Логика работы окна "База данных"."""
 
     def __init__(
         self,
-        repository: RepositoryProtocol,
-        dimension: type[DimensionConverterProtocol],
+        repository: 'RepositoryDB',
+        dimension: type[DimensionConverter],
+        row_view: type[RowViewOnDBTable],
     ) -> None:
         self.repository = repository
         self.dimension = dimension
+        self.row_view = row_view
 
-    def get(self) -> list[RowViewProtocol]:
+    def get(self) -> list[RowViewOnDBTable]:
         """Вернет список объектов-строк."""
         return [
-            RowViewOnDBTable(id, name, description, dimension, price)
+            self.row_view(id, name, description, dimension, price)
             for id, name, description, dimension, price
             in self.repository.get_all()
         ]
@@ -133,4 +133,6 @@ class LogicDBWindow(LogicDBWindowProtocol):
         return str(result_price)
 
 
-logic_db_window = LogicDBWindow(repository, DimensionConverter)
+logic_db_window = LogicDBWindow(
+    repository, DimensionConverter, RowViewOnDBTable
+)

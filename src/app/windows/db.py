@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from typing import Union, TYPE_CHECKING
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
@@ -19,17 +20,20 @@ from PyQt6.QtWidgets import (
 )
 
 from app.logic.dimension import DimensionConverter
-from app.protocol import LogicDBWindowProtocol, RowViewProtocol
+
+if TYPE_CHECKING:
+    from app.logic.adapter import LogicDBWindow, LogicMainWindow
+    from app.models import RowViewOnDBTable, RowViewOnMainTable
 
 
 class DBWindow(QDialog):
-    """Окно управления ингредиентов."""
+    """Окно управления базой данных."""
 
     def __init__(
         self,
         parent: QWidget,
-        logic_for_db: LogicDBWindowProtocol,
-        model_for_db: RowViewProtocol,
+        logic_for_db: 'LogicDBWindow',
+        model_for_db: 'RowViewOnDBTable',
     ):
         super().__init__(parent)
         self.logic_for_db = logic_for_db
@@ -37,6 +41,7 @@ class DBWindow(QDialog):
         self.initUI()
 
     def initUI(self):
+        """Инициация пользовательского интерфейса."""
         self.setWindowTitle('База данных')
         self.setGeometry(320, 420, 700, 500)
 
@@ -78,16 +83,19 @@ class DBWindow(QDialog):
         self.exec()
 
     def load_data(self):
+        """Обновление данных в таблице окна."""
         data = self.logic_for_db.get()
         model = self.model_for_db(data)
         self.table_view.setModel(model)
         self.table_view.hideColumn(0)
 
     def add_item(self):
+        """Откроет окно для добавление записи в базу данных."""
         self.db_add_window = DBAddWindow(self, self.logic_for_db)
         self.load_data()
 
     def update_item(self):
+        """Откроет окно для изменения записи в базе данных."""
         row = self.get_selected_row()
 
         if row is None:
@@ -97,6 +105,7 @@ class DBWindow(QDialog):
         self.load_data()
 
     def delete_item(self):
+        """Откроет окно для удаления строки из базы данных."""
         row = self.get_selected_row()
 
         if row is None:
@@ -117,21 +126,23 @@ class DBWindow(QDialog):
             self.logic_for_db.delete(row.id)
             self.load_data()
 
-    def get_selected_row(self):
+    def get_selected_row(self) -> Union['RowViewOnDBTable', None]:
+        """Вернет выделенную строку из таблицы (модель)."""
         selected = self.table_view.selectionModel().selectedRows()
         if selected:
-            row = selected[0].row()
+            index_row = selected[0].row()
             model = self.table_view.model()
-            if isinstance(model, self.model_for_db):
-                return model.get_row(row)
+            return model.get_row(index_row)
         return None
 
 
 class BaseDBDialogWindow(QDialog):
+    """База для диалогового окна."""
+
     def __init__(
         self,
         parent: QWidget,
-        logic_for_db: LogicDBWindowProtocol,
+        logic_for_db: 'LogicDBWindow',
     ):
         super().__init__(parent)
         self.logic_for_db = logic_for_db
@@ -139,9 +150,11 @@ class BaseDBDialogWindow(QDialog):
 
     @abstractmethod
     def initUI(self):
+        """Инициация пользовательского интерфейса."""
         pass
 
     def _initUI(self):
+        """Часть инициации пользовательского интерфейса."""
         self.setGeometry(340, 440, 400, 270)
 
         layout = QFormLayout()
@@ -155,7 +168,7 @@ class BaseDBDialogWindow(QDialog):
         self.price_input = QDoubleSpinBox()
         self.price_input.setRange(0, 10_000_000)
         self.dimension_input = QComboBox()
-        self.dimension_input.addItems(DimensionConverter.get_all())
+        self.dimension_input.addItems(self.logic_for_db.dimension.get_all())
 
         buttons = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Ok
@@ -178,6 +191,7 @@ class BaseDBDialogWindow(QDialog):
 
     @abstractmethod
     def perform_action(self):
+        """Выполнить действие окна."""
         pass
 
     def validate_form(self):
@@ -210,11 +224,13 @@ class DBAddWindow(BaseDBDialogWindow):
     """Окно добавления ингредиента в базу данных."""
 
     def initUI(self):
+        """Инициация пользовательского интерфейса."""
         self.setWindowTitle('Добавить предмет')
         self._initUI()
         self.exec()
 
     def perform_action(self):
+        """Вызов метода с действием."""
         self.create_item()
 
     def create_item(self):
@@ -234,16 +250,19 @@ class DBAddWindow(BaseDBDialogWindow):
 
 
 class DBUpdateWindow(BaseDBDialogWindow):
+    """Окно изменения ингредиента в базе данных."""
+
     def __init__(
         self,
         parent: QWidget,
-        logic_for_db: LogicDBWindowProtocol,
-        row: RowViewProtocol,
+        logic_for_db: 'LogicDBWindow',
+        row: 'RowViewOnDBTable',
     ):
         self.row = row
         super().__init__(parent, logic_for_db)
 
     def initUI(self):
+        """Инициация пользовательского интерфейса."""
         self.setWindowTitle('Изменить предмет')
         self._initUI()
 
@@ -262,9 +281,11 @@ class DBUpdateWindow(BaseDBDialogWindow):
         self.exec()
 
     def perform_action(self):
+        """Вызов метода с действием."""
         self.update_item()
 
     def update_item(self):
+        """Изменит запись в базе данных."""
         if not self.validate_form():
             return
 

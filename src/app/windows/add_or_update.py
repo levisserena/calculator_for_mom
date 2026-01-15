@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from typing import TYPE_CHECKING
 
 from PyQt6.QtWidgets import (
     QComboBox,
@@ -15,11 +16,9 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from app.protocol import (
-    LogicDBWindowProtocol,
-    LogicMainWindowProtocol,
-    RowViewProtocol,
-)
+if TYPE_CHECKING:
+    from app.logic.adapter import LogicDBWindow, LogicMainWindow
+    from app.models import RowViewOnDBTable, RowViewOnMainTable
 
 
 class BaseRowWindow(QDialog):
@@ -28,15 +27,15 @@ class BaseRowWindow(QDialog):
     def __init__(
         self,
         parent: QWidget,
-        logic_for_main: LogicMainWindowProtocol,
-        logic_for_db: LogicDBWindowProtocol,
-        row_for_main: RowViewProtocol,
+        logic_for_main: 'LogicMainWindow',
+        logic_for_db: 'LogicDBWindow',
+        row_for_main: 'RowViewOnMainTable',
     ) -> None:
         super().__init__(parent)
         self.logic_for_main = logic_for_main
         self.logic_for_db = logic_for_db
         self.row_for_main = row_for_main
-        self.cursor_row: RowViewProtocol | None = None
+        self.cursor_row: 'RowViewOnMainTable' | None = None
         self.initUI()
 
     @abstractmethod
@@ -148,10 +147,10 @@ class UpdateRowWindow(BaseRowWindow):
     def __init__(
         self,
         parent: QWidget,
-        logic_for_main: LogicMainWindowProtocol,
-        logic_for_db: LogicDBWindowProtocol,
-        row_for_main: RowViewProtocol,
-        index_row: RowViewProtocol,
+        logic_for_main: 'LogicMainWindow',
+        logic_for_db: 'LogicDBWindow',
+        row_for_main: 'RowViewOnMainTable',
+        index_row: int,
     ):
         self.index_row = index_row
         super().__init__(parent, logic_for_main, logic_for_db, row_for_main)
@@ -208,8 +207,8 @@ class WindowChoiceItem(QDialog):
     def __init__(
         self,
         parent: QWidget,
-        logic_for_db: LogicDBWindowProtocol,
-        model_for_db: RowViewProtocol,
+        logic_for_db: 'LogicDBWindow',
+        model_for_db: 'RowViewOnDBTable',
     ):
         super().__init__(parent)
         self.logic_for_db = logic_for_db

@@ -2,10 +2,8 @@ from decimal import Decimal
 
 from PyQt6.QtCore import QAbstractTableModel, Qt
 
-from app.protocol import RowViewProtocol
 
-
-class RowViewOnMainTable(RowViewProtocol):
+class RowViewOnMainTable:
     headers = ['Название', 'Количество', 'Размерность', 'Стоимость']
 
     def __init__(
@@ -46,7 +44,7 @@ class RowViewOnMainTable(RowViewProtocol):
         )
 
 
-class RowViewOnDBTable(RowViewProtocol):
+class RowViewOnDBTable:
     headers = ['ID', 'Название', 'Описание', 'Размерность', 'Стоимость']
 
     def __init__(

@@ -1,5 +1,3 @@
-from app.protocol import RepositoryProtocol
-
 from .manager import Connector, connector
 
 NAME_TABLE = 'ingredient'
@@ -34,7 +32,7 @@ class RepositoryStart(RepositoryBase):
             """)
 
 
-class RepositoryDB(RepositoryBase, RepositoryProtocol):
+class RepositoryDB(RepositoryBase):
     """Репозиторий для CRUD-операций с базой данных."""
 
     def get_all(self) -> list:

@@ -25,6 +25,8 @@ from .db import DBWindow
 
 
 class MainWindow(QMainWindow):
+    """Главное окно программы."""
+
     def __init__(self):
         super(MainWindow, self).__init__()
         self.logic_for_main = LogicMainWindow()
@@ -38,6 +40,7 @@ class MainWindow(QMainWindow):
         self.load_data()
 
     def initUI(self):
+        """Инициация пользовательского интерфейса."""
         self.setWindowTitle('Калькулятор для Мамы')
         self.setGeometry(300, 400, 700, 500)
         central_widget = QWidget()
@@ -97,12 +100,14 @@ class MainWindow(QMainWindow):
         self.show()
 
     def load_data(self):
+        """Обновление данных в таблице окна."""
         data = self.logic_for_main.get_all()
         model = self.model_for_main(data)
         self.table_view.setModel(model)
         self.label.setText(self.logic_for_main.calculation())
 
     def add_item(self):
+        """Откроет окно для добавление строки в таблицу окна."""
         self.window_add_row = AddRowWindow(
             parent=self,
             logic_for_main=self.logic_for_main,
@@ -113,10 +118,12 @@ class MainWindow(QMainWindow):
         self.load_data()
 
     def remove_items(self):
+        """Удалит из таблицы окна все строки."""
         self.logic_for_main.clear()
         self.load_data()
 
     def update_item(self):
+        """Откроет окно для изменения строки в таблице окна."""
         index_row = self.get_index_selected_row()
 
         if index_row is None:
@@ -132,6 +139,7 @@ class MainWindow(QMainWindow):
         self.load_data()
 
     def delete_item(self):
+        """Удалит элемент из таблицы окна."""
         index = self.get_index_selected_row()
 
         if index is None:
@@ -141,12 +149,14 @@ class MainWindow(QMainWindow):
         self.load_data()
 
     def get_index_selected_row(self) -> int | None:
+        """Вернет индекс выделенной строки таблицы окна."""
         selected = self.table_view.selectionModel().selectedRows()
         if selected:
             return selected[0].row()
         return None
 
     def open_window_db(self):
+        """Откроет окно управления базой данных."""
         self.window_db = DBWindow(
             parent=self,
             logic_for_db=self.logic_for_db,

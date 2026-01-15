@@ -1,8 +1,6 @@
 from decimal import Decimal
 from enum import Enum
 
-from app.protocol import CategoryType
-
 
 class Category(Enum):
     LENGTH = 'длина'
@@ -13,7 +11,7 @@ class Category(Enum):
 
 class DimensionType:
     def __init__(
-        self, dimension: str, category: CategoryType, weight: int, base: bool
+        self, dimension: str, category: Category, weight: int, base: bool
     ):
         self.dimension = dimension
         self.category = category
@@ -49,7 +47,7 @@ class DimensionConverter(Enum):
         return base.value.dimension, ratio
 
     @classmethod
-    def get_dimensions_by_category(cls, category: CategoryType) -> list[str]:
+    def get_dimensions_by_category(cls, category: Category) -> list[str]:
         """Вернет все размерности для данной категории."""
         return [
             dim.value.dimension
@@ -58,7 +56,7 @@ class DimensionConverter(Enum):
         ]
 
     @classmethod
-    def get_category_by_dimension(cls, dimension: str) -> CategoryType | None:
+    def get_category_by_dimension(cls, dimension: str) -> Category | None:
         """Вернет категорию для данной размерности."""
         categories = [
             dim.value.category
