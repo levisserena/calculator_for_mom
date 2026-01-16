@@ -35,7 +35,7 @@ class RepositoryStart(RepositoryBase):
 class RepositoryDB(RepositoryBase):
     """Репозиторий для CRUD-операций с базой данных."""
 
-    def get_all(self) -> list:
+    def get_all(self) -> list[tuple[int, str, str, str, str]]:
         """Вернет все записи из таблицы базы данных."""
         with self.connector as cursor:
             all_rows = cursor.execute(
@@ -47,10 +47,27 @@ class RepositoryDB(RepositoryBase):
                     {self.field_dimension},
                     {self.field_price}
                 FROM {self.name_table}
-                ORDER BY id
+                ORDER BY name, id
                 """,
             ).fetchall()
         return all_rows
+
+    def get(self, id: int):
+        with self.connector as cursor:
+            row = cursor.execute(
+                f"""
+                SELECT
+                    id,
+                    {self.field_name},
+                    {self.field_description},
+                    {self.field_dimension},
+                    {self.field_price}
+                FROM {self.name_table}
+                WHERE id = ?
+                """,
+                (id,),
+            ).fetchone()
+        return row
 
     def create(
         self,
@@ -82,6 +99,7 @@ class RepositoryDB(RepositoryBase):
         dimension: str,
         description: str,
     ) -> None:
+        """Изменит запись в базе данных по id."""
         with self.connector as cursor:
             cursor.execute(
                 f"""

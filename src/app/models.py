@@ -4,22 +4,32 @@ from PyQt6.QtCore import QAbstractTableModel, Qt
 
 
 class RowViewOnMainTable:
-    headers = ['Название', 'Количество', 'Размерность', 'Стоимость']
+    """Представление строки таблицы на главном окне."""
+
+    headers = ['ID', 'Название', 'Количество', 'Размерность', 'Стоимость']
 
     def __init__(
         self,
+        id: int,
         name: str = '',
         quantity: int | float = 0,
         dimension: str = '',
         price: int | float = 0,
     ):
+        self.id = id
         self.name = name
         self.quantity = quantity
         self.dimension = dimension
         self.price = price
 
     def __getitem__(self, index):
-        return [self.name, self.quantity, self.dimension, self.price][index]
+        return [
+            self.id,
+            self.name,
+            self.quantity,
+            self.dimension,
+            self.price,
+        ][index]
 
     def __len__(self):
         return len(self.headers)
@@ -45,6 +55,8 @@ class RowViewOnMainTable:
 
 
 class RowViewOnDBTable:
+    """Представление строки таблицы на окне базы данных."""
+
     headers = ['ID', 'Название', 'Описание', 'Размерность', 'Стоимость']
 
     def __init__(
@@ -83,67 +95,52 @@ class RowViewOnDBTable:
         )
 
 
-class ViewOnMainTableModels(QAbstractTableModel):
+class BasesViewTableModels(QAbstractTableModel):
+    """Заготовка модели представления таблицы окна."""
+
     def __init__(self, data=None):
         super().__init__()
+        self._data = data or []
+
+    def rowCount(self, index):
+        return len(self._data)
+
+    def columnCount(self, index):
+        return len(self.row.headers)
+
+    def headerData(self, section, orientation, role):
+        if role == Qt.ItemDataRole.DisplayRole:
+            if orientation == Qt.Orientation.Horizontal:
+                return self.row.headers[section]
+        return None
+
+    def data(self, index, role):
+        if role == Qt.ItemDataRole.DisplayRole:
+            return str(self._data[index.row()][index.column()])
+
+        if role == Qt.ItemDataRole.BackgroundRole:
+            if index.row() % 2 == 0:
+                return Qt.GlobalColor.lightGray
+        return None
+
+
+class ViewOnMainTableModels(BasesViewTableModels):
+    """Модель представления таблицы на главном окне."""
+
+    def __init__(self, data=None):
+        super().__init__(data)
         self.row = RowViewOnMainTable
-        self._data = data or []
-
-    def rowCount(self, index):
-        return len(self._data)
-
-    def columnCount(self, index):
-        return len(self.row.headers)
-
-    def headerData(self, section, orientation, role):
-        if role == Qt.ItemDataRole.DisplayRole:
-            if orientation == Qt.Orientation.Horizontal:
-                return self.row.headers[section]
-        return None
-
-    def data(self, index, role):
-        if role == Qt.ItemDataRole.DisplayRole:
-            return str(self._data[index.row()][index.column()])
-
-        if role == Qt.ItemDataRole.BackgroundRole:
-            if index.row() % 2 == 0:
-                return Qt.GlobalColor.lightGray
-        return None
 
 
-class ViewOnDBTableModels(QAbstractTableModel):
+class ViewOnDBTableModels(BasesViewTableModels):
+    """Модель представления таблицы окна базы данных."""
+
     def __init__(self, data=None):
-        super().__init__()
+        super().__init__(data)
         self.row = RowViewOnDBTable
-        self._data = data or []
-
-    def rowCount(self, index):
-        return len(self._data)
-
-    def columnCount(self, index):
-        return len(self.row.headers)
-
-    def headerData(self, section, orientation, role):
-        if role == Qt.ItemDataRole.DisplayRole:
-            if orientation == Qt.Orientation.Horizontal:
-                return self.row.headers[section]
-        return None
-
-    def data(self, index, role):
-        if role == Qt.ItemDataRole.DisplayRole:
-            return str(self._data[index.row()][index.column()])
-
-        if role == Qt.ItemDataRole.BackgroundRole:
-            if index.row() % 2 == 0:
-                return Qt.GlobalColor.lightGray
-        return None
 
     def get_row(self, index_row) -> RowViewOnDBTable | None:
+        """Вернет данные строки по её индексу."""
         if 0 <= index_row < len(self._data):
             return self._data[index_row]
         return None
-
-    # def get_row_id(self, index_row) -> int | None:
-    #     """Получить ID строки."""
-    #     row = self.get_row(index_row)
-    #     return None if row is None else row.id

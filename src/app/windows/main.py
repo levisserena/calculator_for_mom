@@ -1,4 +1,3 @@
-
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QFormLayout,
@@ -104,6 +103,7 @@ class MainWindow(QMainWindow):
         data = self.logic_for_main.get_all()
         model = self.model_for_main(data)
         self.table_view.setModel(model)
+        self.table_view.hideColumn(0)
         self.label.setText(self.logic_for_main.calculation())
 
     def add_item(self):
@@ -134,6 +134,7 @@ class MainWindow(QMainWindow):
             logic_for_db=self.logic_for_db,
             logic_for_main=self.logic_for_main,
             row_for_main=self.row_for_main,
+            model_for_db=self.model_for_db,
             index_row=index_row,
         )
         self.load_data()

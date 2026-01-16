@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
@@ -13,17 +13,14 @@ from PyQt6.QtWidgets import (
     QLineEdit,
     QMessageBox,
     QPushButton,
-    QSpinBox,
     QTableView,
     QTextEdit,
     QWidget,
 )
 
-from app.logic.dimension import DimensionConverter
-
 if TYPE_CHECKING:
-    from app.logic.adapter import LogicDBWindow, LogicMainWindow
-    from app.models import RowViewOnDBTable, RowViewOnMainTable
+    from app.logic.adapter import LogicDBWindow
+    from app.models import RowViewOnDBTable, ViewOnDBTableModels
 
 
 class DBWindow(QDialog):
@@ -33,7 +30,7 @@ class DBWindow(QDialog):
         self,
         parent: QWidget,
         logic_for_db: 'LogicDBWindow',
-        model_for_db: 'RowViewOnDBTable',
+        model_for_db: type['ViewOnDBTableModels'],
     ):
         super().__init__(parent)
         self.logic_for_db = logic_for_db
@@ -84,7 +81,7 @@ class DBWindow(QDialog):
 
     def load_data(self):
         """Обновление данных в таблице окна."""
-        data = self.logic_for_db.get()
+        data = self.logic_for_db.get_all()
         model = self.model_for_db(data)
         self.table_view.setModel(model)
         self.table_view.hideColumn(0)
@@ -163,8 +160,9 @@ class BaseDBDialogWindow(QDialog):
         self.description_input = QTextEdit()
         self.description_input.setMinimumHeight(50)
         self.description_input.setMaximumHeight(100)
-        self.quantity_input = QSpinBox()
+        self.quantity_input = QDoubleSpinBox()
         self.quantity_input.setRange(0, 10_000_000)
+        self.quantity_input.setDecimals(4)
         self.price_input = QDoubleSpinBox()
         self.price_input.setRange(0, 10_000_000)
         self.dimension_input = QComboBox()

@@ -1,4 +1,4 @@
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 from typing import TYPE_CHECKING
 
 from app.db.repository import repository
@@ -61,13 +61,20 @@ class LogicDBWindow:
         self.dimension = dimension
         self.row_view = row_view
 
-    def get(self) -> list[RowViewOnDBTable]:
+    def get_all(self) -> list[RowViewOnDBTable]:
         """Вернет список объектов-строк."""
         return [
             self.row_view(id, name, description, dimension, price)
             for id, name, description, dimension, price
             in self.repository.get_all()
         ]
+
+    def get(self, id: int) -> RowViewOnDBTable | None:
+        """Вернет строку по переданному id."""
+        item = self.repository.get(id)
+        if item is None:
+            return None
+        return self.row_view(*item)
 
     def add(
         self,
@@ -78,14 +85,12 @@ class LogicDBWindow:
         description: str,
     ) -> None:
         """Подсчитает цену за размерность и добавит запись в базу данных."""
-        quoted_dimension, quoted_price = self._calculation_to_base_quantity(
-            price, quantity, dimension
-        )
+        quoted_price = self._calculation(price, quantity)
 
         self.repository.create(
             name=name,
             price=quoted_price,
-            dimension=quoted_dimension,
+            dimension=dimension,
             description=description,
         )
 
@@ -103,34 +108,41 @@ class LogicDBWindow:
         description: str,
     ) -> None:
         """Изменит запись из базы данных."""
-        quoted_dimension, quoted_price = self._calculation_to_base_quantity(
-            price, quantity, dimension
-        )
+        quoted_price = self._calculation(price, quantity)
 
         self.repository.update(
             id_item,
             name=name,
             price=quoted_price,
-            dimension=quoted_dimension,
+            dimension=dimension,
             description=description,
         )
 
-    def _calculation_to_base_quantity(
-        self, price: float, quantity: int, dimension: str
-    ) -> tuple[str, str]:
+    def _calculation(self, price: float, quantity: int) -> str:
+        """Вычислит стоимость одной единицы."""
         result_price = Decimal(price) / Decimal(quantity)
-        return self.dimension.get_base(dimension, result_price)
+        rounded_result = result_price.quantize(
+            Decimal('0.01'), rounding=ROUND_HALF_UP
+        )
+        return str(rounded_result)
 
-    def calculation(self, price: float, quantity: int, dimension: str) -> str:
+    def calculation(
+        self,
+        price: int | float | str,
+        quantity: int | float | str,
+        current_dimension: str,
+        db_dimension: str,
+    ) -> float:
         """
         Вернет стоимость, исходя из цены за единицу измерения (например, м),
         количеств в единцах измерения (например, см).
         """
-        _, price_per_dimension = self.dimension.get_base(
-            dimension, Decimal(price)
+        ratio = self.dimension.get_ratio(current_dimension, db_dimension)
+        result_price = Decimal(Decimal(price)) * Decimal(quantity) * ratio
+        rounded_result = result_price.quantize(
+            Decimal('0.01'), rounding=ROUND_HALF_UP
         )
-        result_price = Decimal(price_per_dimension) * Decimal(quantity)
-        return str(result_price)
+        return float(rounded_result)
 
 
 logic_db_window = LogicDBWindow(
