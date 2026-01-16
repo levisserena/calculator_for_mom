@@ -62,6 +62,7 @@ class MainWindow(QMainWindow):
         header = self.table_view.horizontalHeader()
         header.setFixedHeight(40)
         header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.table_view.doubleClicked.connect(self.update_item)
 
         layout_left_top.addRow('', self.table_view)
 

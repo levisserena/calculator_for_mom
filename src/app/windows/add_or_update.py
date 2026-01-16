@@ -231,9 +231,9 @@ class WindowChoiceItem(QDialog):
         )
         self.table_view.setAlternatingRowColors(True)
         header = self.table_view.horizontalHeader()
-        if header:
-            header.setFixedHeight(40)
-            header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        header.setFixedHeight(40)  # type: ignore
+        header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)  # type: ignore
+        self.table_view.doubleClicked.connect(self.get_item)
 
         layout_left.addRow('', self.table_view)
 
